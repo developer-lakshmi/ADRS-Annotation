@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useImperativeHandle } from "react";
 import { Stage, Layer, Image as KonvaImage, Rect, Text, Group } from "react-konva";
 import { useDispatch, useSelector } from "react-redux";
 import { setImageAnnotation } from "../../../../redux/slices/annotation/annotationSlice";
@@ -22,22 +22,23 @@ const viewerBg = isFullscreen => ({
     minHeight: 0,
 });
 
-const ImageViewer = ({
-    fileUrl,
-    fileName,
-    zoom,
-    setZoom,
-    onZoomIn,
-    onZoomOut,
-    annotateMode,
-    setAnnotateMode,
-    isFullscreen,
-    onFullscreen,
-    annotationCategory,
-    annotations,
-    setAnnotations,
-    annotationMode,
-}) => {
+const ImageViewer = React.forwardRef((props, ref) => {
+    const {
+        fileUrl,
+        fileName,
+        zoom,
+        setZoom,
+        onZoomIn,
+        onZoomOut,
+        annotateMode,
+        setAnnotateMode,
+        isFullscreen,
+        onFullscreen,
+        annotationCategory,
+        annotations,
+        setAnnotations,
+        annotationMode,
+    } = props;
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     const [dragging, setDragging] = useState(false);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
@@ -343,8 +344,29 @@ const handleApprove = () => {
   alert("Approve action triggered!");
 };
 
+    // Download annotated image as PDF
+    const handleDownloadAnnotated = async () => {
+        if (!containerRef.current) return;
+        await new Promise(r => setTimeout(r, 100));
+        const html2canvas = (await import("html2canvas")).default;
+        const jsPDF = (await import("jspdf")).default;
+        const canvas = await html2canvas(containerRef.current, { backgroundColor: "#fff", useCORS: true });
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+            orientation: canvas.width > canvas.height ? "landscape" : "portrait",
+            unit: "px",
+            format: [canvas.width, canvas.height],
+        });
+        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+        pdf.save("annotated.pdf");
+    };
+
+    useImperativeHandle(ref, () => ({
+        download: handleDownloadAnnotated
+    }));
+
     return (
-        <div style={viewerBg(isFullscreen)}>
+        <div ref={containerRef} style={viewerBg(props.isFullscreen)}>
           <div
             ref={containerRef}
             style={{
@@ -557,7 +579,7 @@ const handleApprove = () => {
            <pre>{JSON.stringify(getCocoJson(), null, 2)}</pre> */}
         </div>
     );
-};
+});
 
 export default ImageViewer;
 

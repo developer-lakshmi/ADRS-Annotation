@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Topbar from "../../../../components/common/Topbar";
 import { useSelector, useDispatch } from "react-redux";
@@ -54,9 +54,11 @@ const DocViewPage = () => {
   const [annotateMode, setAnnotateMode] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [annotations, setAnnotations] = useState([]);
-  const [annotationMode, setAnnotationMode] = useState("box"); // "box" or "free"
+  const [annotationMode, setAnnotationMode] = useState(false); // "box" or "free"
   const [showMenu, setShowMenu] = useState(false);
   const iconRef = useRef();
+  const pdfViewerRef = useRef();
+  const imageViewerRef = useRef();
 
   const iconButtonClass = "p-1.5 sm:p-2 rounded text-white transition-colors";
   const fileUrl = file?.url || "";
@@ -100,10 +102,27 @@ const DocViewPage = () => {
     alert("Approve action triggered!");
   };
 
-  // Reset annotation mode to OFF when file changes
-  useEffect(() => {
-    setAnnotateMode(false);
-  }, [fileId]);
+  const handleDownloadAnnotatedPdf = () => {
+    if (pdfViewerRef.current) {
+      pdfViewerRef.current.download();
+    }
+  };
+
+  const handleDownloadAnnotatedImage = () => {
+    if (imageViewerRef.current) {
+      imageViewerRef.current.download();
+    }
+  };
+
+  const handleDownloadAnnotated = () => {
+    if (fileExtension === "pdf") {
+      handleDownloadAnnotatedPdf();
+    } else if (imageTypes.includes(fileExtension)) {
+      handleDownloadAnnotatedImage();
+    } else {
+      handleDownload(); // fallback to original download
+    }
+  };
 
   useEffect(() => {
     if ((!files || files.length === 0) && projectId) {
@@ -323,7 +342,7 @@ const DocViewPage = () => {
       <ActionButtons
         onProcess={handleReprocess}
         onApprove={handleApprove}
-        onDownload={handleDownload}
+        onDownload={handleDownloadAnnotated} // <-- use the new handler
       />
 
       {/* Content Below Topbar */}
@@ -358,6 +377,8 @@ const DocViewPage = () => {
                 setAnnotations={setAnnotations}
                 annotationMode={annotationMode}
                 setAnnotationMode={setAnnotationMode}
+                ref={pdfViewerRef}
+                onDownload={handleDownloadAnnotatedPdf}
               />
             ) : imageTypes.includes(fileExtension) ? (
               <ImageViewer
@@ -370,7 +391,6 @@ const DocViewPage = () => {
                 onReset={handleReset}
                 annotateMode={annotateMode}
                 setAnnotateMode={setAnnotateMode}
-                onDownload={handleDownload}
                 isFullscreen={isFullscreen}
                 onFullscreen={handleFullscreen}
                 annotationCategory={selectedCategory}
@@ -378,6 +398,8 @@ const DocViewPage = () => {
                 setAnnotations={setAnnotations}
                 annotationMode={annotationMode}
                 setAnnotationMode={setAnnotationMode}
+                ref={imageViewerRef}
+                onDownload={handleDownloadAnnotatedImage}
               />
             ) : (
               <div className="text-gray-500">Unsupported file type.</div>

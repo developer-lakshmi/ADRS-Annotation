@@ -3,17 +3,19 @@ import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
-import AnnotationLayer from './AnnotationLayer'; // <-- import
+import AnnotationLayer from './AnnotationLayer';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
-const PdfViewer = ({
+const PdfViewer = React.forwardRef(({
     fileUrl,
     annotateMode,
     annotationCategory,
     annotations,
     setAnnotationMode,
     setAnnotations,
-    annotationMode, // "box" or "free"
-}) => {
+    annotationMode,
+}, ref) => {
     const defaultLayoutPluginInstance = defaultLayoutPlugin();
     const viewerRef = React.useRef(null);
     const [zoomLevel, setZoomLevel] = React.useState(1.0);
@@ -44,9 +46,27 @@ const PdfViewer = ({
         };
     }, [zoomLevel]);
 
-    return (
-        <>
+    const handleDownloadAnnotated = async () => {
+        if (!viewerRef.current) return;
+        // Wait a tick for any overlay to render
+        await new Promise(r => setTimeout(r, 100));
+        const canvas = await html2canvas(viewerRef.current, { backgroundColor: "#fff", useCORS: true });
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+            orientation: canvas.width > canvas.height ? "landscape" : "portrait",
+            unit: "px",
+            format: [canvas.width, canvas.height],
+        });
+        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+        pdf.save("annotated.pdf");
+    };
 
+    // Expose download method to parent via ref
+    React.useImperativeHandle(ref, () => ({
+        download: handleDownloadAnnotated
+    }));
+
+    return (
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
             <div
                 ref={viewerRef}
@@ -82,8 +102,7 @@ const PdfViewer = ({
                 </div>
             </div>
         </Worker>
-        </>
     );
-};
+});
 
 export default PdfViewer;
