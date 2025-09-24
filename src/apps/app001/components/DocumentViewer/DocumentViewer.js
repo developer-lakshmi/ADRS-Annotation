@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Topbar from "../../../../components/common/Topbar";
 import { useSelector, useDispatch } from "react-redux";
@@ -100,7 +100,10 @@ const DocViewPage = () => {
     alert("Approve action triggered!");
   };
 
- 
+  // Reset annotation mode to OFF when file changes
+  useEffect(() => {
+    setAnnotateMode(false);
+  }, [fileId]);
 
   useEffect(() => {
     if ((!files || files.length === 0) && projectId) {

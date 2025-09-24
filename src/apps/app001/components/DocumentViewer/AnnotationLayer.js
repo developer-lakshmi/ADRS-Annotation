@@ -123,7 +123,16 @@ export default function AnnotationLayer({
   const handleMouseUp = () => {
     if (drawing && newShape) {
       setDrawing(false);
-      setDialogOpen(true);
+
+      // Only show dialog if a valid annotation is drawn
+      if (
+        (newShape.type === "box" && Math.abs(newShape.width) > 5 && Math.abs(newShape.height) > 5) ||
+        (newShape.type === "free" && newShape.points && newShape.points.length > 6)
+      ) {
+        setDialogOpen(true);
+      } else {
+        setNewShape(null); // Discard tiny/invalid shapes
+      }
     }
   };
 
@@ -190,11 +199,10 @@ export default function AnnotationLayer({
       <Stage
         width={width}
         height={height}
-        // Only enable drawing events if annotateMode is true
-        onMouseDown={annotationMode && !drawing ? handleMouseDown : undefined}
-        onMouseMove={annotationMode && drawing ? handleMouseMove : undefined}
-        onMouseUp={annotationMode && drawing ? handleMouseUp : undefined}
-        style={{ position: "absolute", top: 0, left: 0, pointerEvents: "auto" }}
+        onMouseDown={annotateMode && annotationMode && !drawing ? handleMouseDown : undefined}
+        onMouseMove={annotateMode && annotationMode && drawing ? handleMouseMove : undefined}
+        onMouseUp={annotateMode && annotationMode && drawing ? handleMouseUp : undefined}
+        style={{ cursor: drawing ? "grabbing" : annotateMode ? "crosshair" : "grab" }}
       >
         <Layer>
           {/* Always render all annotations */}
