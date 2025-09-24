@@ -1,0 +1,8 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore backend uploads
+backend/uploads/
+
+# Ignore log files
+*.log

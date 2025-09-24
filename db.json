@@ -1,0 +1,96 @@
+{
+  "uploadedFiles": [],
+  "projects": [
+    {
+      "id": "wsctl6k1y",
+      "projectName": "Test Project",
+      "clientName": "LNG Train",
+      "projectCode": "1345",
+      "decipline": "Process",
+      "mLModel": "",
+      "docType": "",
+      "projectPurpose": "",
+      "description": "",
+      "cadSystem": "",
+      "tolerance": "-1",
+      "maxArialGap": "",
+      "arrowSize": "",
+      "inputSpaceHeight": "",
+      "inputSpaceWidth": "",
+      "cadOutput": "",
+      "diameterSymbol": "",
+      "arrowBuffer": "",
+      "outputDrawingBorder": "",
+      "inputSpaceUnit": "",
+      "endpointDistance": "",
+      "gridSize": "",
+      "securityLevel": "",
+      "encryptionKey": ""
+    }
+  ],
+  "signup": [
+    {
+      "id": "fdfc",
+      "employeeId": "12345",
+      "email": "admin@gmail.com",
+      "password": "Admin@123"
+    },
+    {
+      "id": "7094",
+      "employeeId": "22334",
+      "email": "Mohini@gmail.com",
+      "password": "Mohini@123"
+    },
+    {
+      "id": "c145",
+      "employeeId": "67890",
+      "email": "Admin6@gmail.com",
+      "password": "Admin@123"
+    }
+  ],
+  "login": [
+    {
+      "id": "fdfc",
+      "employeeId": "12345",
+      "password": "Admin@123"
+    },
+    {
+      "id": "7094",
+      "employeeId": "22334",
+      "password": "Mohini@123"
+    },
+    {
+      "id": "c145",
+      "employeeId": "67890",
+      "password": "Admin@123"
+    }
+  ],
+  "appDetails": [
+    {
+      "id": "1",
+      "appId": "001",
+      "role": "Admin",
+      "profiles": [
+        {
+          "bgImg": "/images/img4.webp",
+          "name": "EDRS",
+          "description": "Developer at GHI",
+          "link": "https://example.com/bobbrown"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "appId": "002",
+      "role": "Support Agent",
+      "profiles": [
+        {
+          "bgImg": "/images/img1.webp",
+          "name": " PIDAutoGen",
+          "description": "Product Manager at ABC",
+          "link": "https://example.com/janesmith"
+        }
+      ]
+    }
+  ]
+}

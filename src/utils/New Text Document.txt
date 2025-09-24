@@ -1,0 +1,3 @@
+ /utils
+│   ├── rolesConfig.js               // Roles and permissions configuration (admin, user, etc.)
+│   └── globalHelpers.js             // Helper functions for global utility (e.g., formatting, date utils)

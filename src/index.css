@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    font-family: Outfit;
+}
+
+html, body {
+    min-height: 100%;
+    background-color: #fff; /* Default light mode background */
+}
+
+html.dark, body.dark {
+    background-color: #11001F; /* Dark mode background */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+    padding: 0;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.responsive-img {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .p-4 {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .p-4 {
+        padding: 0.5rem;
+    }
+}
