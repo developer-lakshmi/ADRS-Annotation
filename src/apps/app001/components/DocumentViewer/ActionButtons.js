@@ -1,7 +1,8 @@
 import React from "react";
 import { RotateCw, CheckCircle2, Download } from "lucide-react";
+import CircularProgress from "@mui/material/CircularProgress";
 
-const ActionButtons = ({ onProcess, onApprove, onDownload }) => (
+const ActionButtons = ({ onProcess, onApprove, onDownload, approveLoading, downloadLoading }) => (
   <div
     style={{
       display: "flex",
@@ -31,6 +32,7 @@ const ActionButtons = ({ onProcess, onApprove, onDownload }) => (
         transition: "background 0.2s",
       }}
       title="Reprocess"
+      disabled={approveLoading}
     >
       <RotateCw size={18} style={{ marginRight: 4 }} />
       Reprocess
@@ -51,11 +53,22 @@ const ActionButtons = ({ onProcess, onApprove, onDownload }) => (
         cursor: "pointer",
         boxShadow: "0 2px 8px #0d948822",
         transition: "background 0.2s",
+        position: "relative",
       }}
       title="Approve"
+      disabled={approveLoading}
     >
-      <CheckCircle2 size={18} style={{ marginRight: 4 }} />
-      Approve
+      {approveLoading ? (
+        <>
+          <CircularProgress size={20} color="inherit" style={{ marginRight: 4 }} />
+          Approve
+        </>
+      ) : (
+        <>
+          <CheckCircle2 size={18} style={{ marginRight: 4 }} />
+          Approve
+        </>
+      )}
     </button>
     <button
       onClick={onDownload}
@@ -75,9 +88,19 @@ const ActionButtons = ({ onProcess, onApprove, onDownload }) => (
         transition: "background 0.2s",
       }}
       title="Download"
+      disabled={approveLoading || downloadLoading}
     >
-      <Download size={18} style={{ marginRight: 4 }} />
-      Download
+      {downloadLoading ? (
+        <>
+          <CircularProgress size={20} color="inherit" style={{ marginRight: 4 }} />
+          Download
+        </>
+      ) : (
+        <>
+          <Download size={18} style={{ marginRight: 4 }} />
+          Download
+        </>
+      )}
     </button>
   </div>
 );

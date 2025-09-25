@@ -44,6 +44,13 @@ const getType = (file) => {
   return "Other";
 };
 
+const getStatusLabel = (status) => {
+  if (status === "approved") return "Approved";
+  if (status === "success") return "Processed";
+  if (status === "need_approve") return "Need to approve";
+  return "Not processed";
+};
+
 const FileManagementPage = ({ projectId }) => {
   const dispatch = useDispatch();
   const files = useSelector((state) => state.fileManagement.files);
@@ -61,12 +68,12 @@ const FileManagementPage = ({ projectId }) => {
 
   const rows = files.map((file, index) => ({
     id: file.id || file.name || index + 1,
-    serialNo: getSerialNo(file.name),
+    serialNo: index + 1,
     name: file.name || "N/A",
     type: getType(file),
     size: formatSize(file.size),
     lastModified: formatDate(file.lastModified),
-    status: fileStatuses[file.id] || "Not processed",
+    status: getStatusLabel(fileStatuses[file.id]),
   }));
 
   const columns = [
@@ -74,11 +81,10 @@ const FileManagementPage = ({ projectId }) => {
     {
       field: "name",
       headerName: "Drawing Title",
-      // flex: 1,
       minWidth: 280,
       renderCell: (params) => {
         const status = fileStatuses[params.row.id];
-        const isSuccess = status === "success";
+        const isSuccess = status === "success" || status === "approved" || status === "need_approve";
         return isSuccess ? (
           <Tooltip title={params.value} arrow>
             <Link
@@ -104,35 +110,6 @@ const FileManagementPage = ({ projectId }) => {
       },
     },
     {
-      field: "status",
-      headerName: "Status",
-      width: 150,
-      headerAlign: "center",
-      align: "center",
-      renderCell: (params) => {
-        const status = fileStatuses[params.row.id];
-        let dotColor = "bg-gray-400";
-        let tooltipText = "Not processed";
-        if (status === "success") {
-          dotColor = "bg-green-500";
-          tooltipText = "Success";
-        } else if (status === "failure") {
-          dotColor = "bg-red-500";
-          tooltipText = "Error";
-        }
-        return (
-          <div className="flex items-center justify-center w-full h-full">
-            <Tooltip title={tooltipText} arrow>
-              <span
-                className={`inline-block w-[10px] h-[10px] rounded-full ${dotColor} cursor-pointer`}
-                aria-label={tooltipText}
-              />
-            </Tooltip>
-          </div>
-        );
-      }
-    },
-    {
       field: "type",
       headerName: "Type",
       width: 150,
@@ -154,9 +131,33 @@ const FileManagementPage = ({ projectId }) => {
     {
       field: "lastModified",
       headerName: "Last Modified",
-      width:180,
+      width: 180,
       headerAlign: "center",
       align: "center",
+    },
+    // Status column LAST
+    {
+      field: "status",
+      headerName: "Status",
+      width: 170,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        let color = "#9ca3af"; // gray
+        if (params.value === "Processed") color = "#22c55e"; // green
+        if (params.value === "Approved") color = "#0ea5e9"; // blue
+        if (params.value === "Need to approve") color = "#f59e42"; // orange
+        return (
+          <span style={{
+            color,
+            fontWeight: 600,
+            fontSize: 15,
+            letterSpacing: 0.2,
+          }}>
+            {params.value}
+          </span>
+        );
+      }
     },
   ];
 

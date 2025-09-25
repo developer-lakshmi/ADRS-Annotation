@@ -11,6 +11,7 @@ import { setSelectedCategory } from "../../../../redux/slices/annotation/annotat
 import CircularProgress from "@mui/material/CircularProgress";
 import { PencilIcon, SquareDashedBottom, PencilLine } from "lucide-react";
 import ActionButtons from "./ActionButtons";
+import { updateFileStatus } from "../../../../redux/slices/file-upload/fileStatusSlice";
 
 const categories = [
   { id: 1, name: "Instrument", color: "#1976d2" },
@@ -56,6 +57,8 @@ const DocViewPage = () => {
   const [annotations, setAnnotations] = useState([]);
   const [annotationMode, setAnnotationMode] = useState(false); // "box" or "free"
   const [showMenu, setShowMenu] = useState(false);
+  const [approveLoading, setApproveLoading] = useState(false);
+  const [downloadLoading, setDownloadLoading] = useState(false);
   const iconRef = useRef();
   const pdfViewerRef = useRef();
   const imageViewerRef = useRef();
@@ -76,6 +79,7 @@ const DocViewPage = () => {
   const handleZoomOut = () => setZoom(z => Math.max(z - 0.1, 0.2));
   const handleReset = () => setZoom(1);
   const handleDownload = async () => {
+    setDownloadLoading(true);
     try {
       const response = await fetch(fileUrl, { mode: "cors" });
       const blob = await response.blob();
@@ -89,6 +93,8 @@ const DocViewPage = () => {
       window.URL.revokeObjectURL(url);
     } catch (e) {
       alert("Failed to download image.");
+    } finally {
+      setDownloadLoading(false);
     }
   };
 
@@ -97,9 +103,14 @@ const DocViewPage = () => {
     alert("Process action triggered!");
   };
 
-  const handleApprove = () => {
-    // Implement your approve logic here
-    alert("Approve action triggered!");
+  const handleApprove = async () => {
+    setApproveLoading(true);
+    // Simulate async (replace with real API call in future)
+    await new Promise(res => setTimeout(res, 1000));
+    if (fileId) {
+      dispatch(updateFileStatus({ fileId, status: "approved" }));
+    }
+    setApproveLoading(false);
   };
 
   const handleDownloadAnnotatedPdf = () => {
@@ -342,7 +353,9 @@ const DocViewPage = () => {
       <ActionButtons
         onProcess={handleReprocess}
         onApprove={handleApprove}
-        onDownload={handleDownloadAnnotated} // <-- use the new handler
+        onDownload={handleDownload}
+        approveLoading={approveLoading}
+        downloadLoading={downloadLoading}
       />
 
       {/* Content Below Topbar */}

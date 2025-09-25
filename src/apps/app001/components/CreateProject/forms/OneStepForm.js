@@ -4,9 +4,8 @@ import React, { useState, useEffect } from "react";
 const ProjectForm = ({ onSubmit, initialData = {} }) => {
   const [formData, setFormData] = useState({
     projectName: "",
-    userId: "",
-    decipline: "",
-    docType: "",
+    projectId: "",
+    projectType: "",
     projectDescription: "",
   });
 
@@ -45,7 +44,7 @@ const ProjectForm = ({ onSubmit, initialData = {} }) => {
 
   return (
     <Container maxWidth="sm" className="m-4">
-      <h2 className="text-2xl font-extrabold mb-4 text-blue-700 dark:text-blue-400 text-center tracking-wide uppercase">
+      <h2 className="text-2xl font-extrabold mb-6 text-blue-700 dark:text-blue-400 text-center tracking-wide uppercase">
         Project Information
       </h2>
       <form
@@ -54,60 +53,62 @@ const ProjectForm = ({ onSubmit, initialData = {} }) => {
         autoComplete="off"
         style={{ overflowY: "auto", maxHeight: "80vh" }}
       >
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-          <input
-            type="text"
-            placeholder="Project Name"
-            required
-            className="w-full p-3 outline-none border border-gray-300 rounded-md bg-white dark:bg-darkHover/30 dark:border-white/90 transition focus:border-blue-500"
-            name="projectName"
-            value={formData.projectName}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          />
-          <input
-            type="text"
-            placeholder="User ID"
-            required
-            className="w-full p-3 outline-none border border-gray-300 rounded-md bg-white dark:bg-darkHover/30 dark:border-white/90 transition focus:border-blue-500"
-            name="userId"
-            value={formData.userId}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          />
-          {/* Decipline and DocType in one row on desktop, stacked on mobile */}
-          <div className="flex flex-col sm:flex-row sm:col-span-2 gap-4">
-            <select
-              name="decipline"
-              value={formData.decipline}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+          <div className="col-span-1 sm:col-span-2">
+            <label className="block mb-1 text-sm font-semibold text-gray-700 dark:text-white">
+              Project Name
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Project Name"
               required
-              className="w-full sm:w-1/2 p-3 outline-none border border-gray-300 rounded-md bg-white dark:bg-darkHover/30 dark:border-white/90 transition focus:border-blue-500"
+              className="w-full p-3 outline-none border border-gray-300 rounded-md bg-white dark:bg-darkHover/30 dark:border-white/90 transition focus:border-blue-500"
+              name="projectName"
+              value={formData.projectName}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+          <div className="col-span-1 sm:col-span-2">
+            <label className="block mb-1 text-sm font-semibold text-gray-700 dark:text-white">
+              Project ID
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Project ID"
+              required
+              className="w-full p-3 outline-none border border-gray-300 rounded-md bg-white dark:bg-darkHover/30 dark:border-white/90 transition focus:border-blue-500"
+              name="projectId"
+              value={formData.projectId}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+          <div className="col-span-1 sm:col-span-2">
+            <label className="block mb-1 text-sm font-semibold text-gray-700 dark:text-white">
+              Project Type
+            </label>
+            <select
+              name="projectType"
+              value={formData.projectType}
+              required
+              className="w-full p-3 outline-none border border-gray-300 rounded-md bg-white dark:bg-darkHover/30 dark:border-white/90 transition focus:border-blue-500"
               onChange={handleChange}
               onKeyDown={handleKeyDown}
             >
-              <option value="">Select Discipline</option>
+              <option value="">Select Project Type</option>
               <option value="Process">Process</option>
               <option value="Instrumentation">Instrumentation</option>
               <option value="Piping">Piping</option>
               <option value="Civil">Civil</option>
             </select>
-            <select
-              name="docType"
-              value={formData.docType}
-              required
-              className="w-full sm:w-1/2 p-3 outline-none border border-gray-300 rounded-md bg-white dark:bg-darkHover/30 dark:border-white/90 transition focus:border-blue-500"
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-            >
-              <option value="">Select Document Type</option>
-              <option value="PDF">PDF</option>
-              <option value="Image">Image</option>
-              <option value="AutoCAD">AutoCAD</option>
-            </select>
           </div>
-          <div className="sm:col-span-2">
+          <div className="col-span-1 sm:col-span-2">
+            <label className="block mb-1 text-sm font-semibold text-gray-700 dark:text-white">
+              Project Description
+            </label>
             <textarea
-              placeholder="Project Description"
+              placeholder="Enter Project Description"
               className="w-full p-3 outline-none border border-gray-300 rounded-md bg-white dark:bg-darkHover/30 dark:border-white/90 transition focus:border-blue-500"
               name="projectDescription"
               rows={3}
@@ -117,8 +118,8 @@ const ProjectForm = ({ onSubmit, initialData = {} }) => {
             ></textarea>
           </div>
         </div>
-        <div className="flex justify-end mt-6 gap-4">
-          <Button type="submit" variant="contained" color="primary">
+        <div className="flex justify-end mt-8 gap-4">
+          <Button type="submit" variant="contained" color="primary" size="large">
             Submit
           </Button>
         </div>

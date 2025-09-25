@@ -10,9 +10,16 @@ const fileStatusSlice = createSlice({
     },
     clearFileStatuses: () => {
       return {};
+    },
+    updateFileStatus: (state, action) => {
+      // action.payload: { fileId, status }
+      const { fileId, status } = action.payload;
+      if (fileId) {
+        state[fileId] = status;
+      }
     }
   }
 });
 
-export const { setFileStatuses, clearFileStatuses } = fileStatusSlice.actions;
+export const { setFileStatuses, clearFileStatuses, updateFileStatus } = fileStatusSlice.actions;
 export default fileStatusSlice.reducer;
