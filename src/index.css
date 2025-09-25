@@ -48,3 +48,24 @@ h1, h2, h3, h4, h5, h6, p {
         padding: 0.5rem;
     }
 }
+/* Hide the right toolbar section */
+/* .rpv-toolbar__right {
+    display: none !important;
+} */
+
+/* Hide all right toolbar items except the "More actions" button */
+
+
+/* Hide theme switch, full screen, open, download, print buttons in the right toolbar */
+.rpv-toolbar__right [data-testid="theme__switch-button"],
+.rpv-toolbar__right [data-testid="full-screen__enter-button"],
+.rpv-toolbar__right [data-testid="open__button"],
+.rpv-toolbar__right [data-testid="get-file__download-button"],
+.rpv-toolbar__right [data-testid="print__button"] {
+    display: none !important;
+}
+
+.rpv-default-layout__sidebar,
+.rpv-default-layout__sidebar--ltr {
+    display: none !important;
+}
