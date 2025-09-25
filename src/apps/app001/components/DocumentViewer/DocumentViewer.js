@@ -169,6 +169,9 @@ const DocViewPage = () => {
     };
   }, [showMenu]);
 
+  const fileStatuses = useSelector(state => state.fileStatus);
+  const isApproved = fileStatuses[fileId] === "approved";
+
   return (
     <div
       className="relative"
@@ -353,9 +356,10 @@ const DocViewPage = () => {
       <ActionButtons
         onProcess={handleReprocess}
         onApprove={handleApprove}
-        onDownload={handleDownload}
+        onDownload={handleDownloadAnnotated}
         approveLoading={approveLoading}
         downloadLoading={downloadLoading}
+        isApproved={isApproved}
       />
 
       {/* Content Below Topbar */}

@@ -2,7 +2,14 @@ import React from "react";
 import { RotateCw, CheckCircle2, Download } from "lucide-react";
 import CircularProgress from "@mui/material/CircularProgress";
 
-const ActionButtons = ({ onProcess, onApprove, onDownload, approveLoading, downloadLoading }) => (
+const ActionButtons = ({
+  onProcess,
+  onApprove,
+  onDownload,
+  approveLoading,
+  downloadLoading,
+  isApproved,
+}) => (
   <div
     style={{
       display: "flex",
@@ -32,7 +39,7 @@ const ActionButtons = ({ onProcess, onApprove, onDownload, approveLoading, downl
         transition: "background 0.2s",
       }}
       title="Reprocess"
-      disabled={approveLoading}
+      disabled={approveLoading || isApproved}
     >
       <RotateCw size={18} style={{ marginRight: 4 }} />
       Reprocess
@@ -43,25 +50,31 @@ const ActionButtons = ({ onProcess, onApprove, onDownload, approveLoading, downl
         display: "flex",
         alignItems: "center",
         gap: 8,
-        background: "#0d9488", // Teal 600
+        background: isApproved ? "#0ea5e9" : "#0d9488", // Blue if approved, teal otherwise
         color: "#fff",
         border: "none",
         borderRadius: 6,
         padding: "8px 20px",
         fontWeight: 600,
         fontSize: 15,
-        cursor: "pointer",
+        cursor: isApproved ? "default" : "pointer",
         boxShadow: "0 2px 8px #0d948822",
         transition: "background 0.2s",
         position: "relative",
+        opacity: isApproved ? 0.85 : 1,
       }}
-      title="Approve"
-      disabled={approveLoading}
+      title={isApproved ? "Already approved" : "Approve"}
+      disabled={approveLoading || isApproved}
     >
       {approveLoading ? (
         <>
           <CircularProgress size={20} color="inherit" style={{ marginRight: 4 }} />
           Approve
+        </>
+      ) : isApproved ? (
+        <>
+          <CheckCircle2 size={18} style={{ marginRight: 4 }} />
+          Approved
         </>
       ) : (
         <>
