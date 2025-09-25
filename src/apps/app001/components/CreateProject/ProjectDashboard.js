@@ -37,23 +37,27 @@ const ProjectDashboard = ({ projects, loading, handleStart, handleDelete, appId 
                 className="w-full max-w-[375px] 2xl:max-w-[420px] h-44  bg-white/20 dark:bg.transparent border rounded-lg shadow-lg hover:scale-105 transition-transform cursor-pointer p-4 flex flex-col justify-between text-gray-600 dark:text-white/50 dark:hover:text-white/100 dark:hover:bg-white/10"
               >
                 <h3 className="text-lg font-bold mb-2">{project.projectName}</h3>
-                <p className="text-sm mb-4">{project.clientName}</p>
+                {/* <p className="text-sm mb-4">{project.clientName}</p> */}
+                <p className="text-sm mb-4">{project.userId}</p>
                 <div className="flex justify-end space-x-2 mt-auto">
                   <button
                     onClick={() => handleStart(project.id)}
                     className={`${iconButtonClass} bg-green-500 hover:bg-green-600`}
+                    title="Start Project"
                   >
                     <Play size={16} />
                   </button>
                   <button
                     onClick={() => navigate(`/app/${appId}/dashboard/newprojectid/${project.id}`)}
                     className={`${iconButtonClass} bg-blue-500 hover:bg-blue-600`}
+                    title="Edit Project"
                   >
                     <Pencil size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(project.id)}
                     className={`${iconButtonClass} bg-red-500 hover:bg-red-600`}
+                    title="Delete Project"
                   >
                     <Trash2 size={16} />
                   </button>

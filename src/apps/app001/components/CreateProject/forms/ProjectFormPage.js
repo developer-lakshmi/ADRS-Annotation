@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addProject, editProject } from "../../../../../redux/slices/create-projects/projectsSlice";
-import MultiStepForm from "./MultiStepForm";
+// import MultiStepForm from "./MultiStepForm";
+import OneStepForm from './OneStepForm';
 import { ArrowLeft } from "lucide-react";
 import SkeletonForm from "../../../../../components/Loader/SkeletonForm";
 
@@ -79,7 +80,9 @@ const ProjectFormPage = () => {
        </div>
 
         <hr className="border-gray-300 dark:border-gray-600" />        {/* Pass handleSubmit and initialData to MultiStepForm */}
-        <MultiStepForm onSubmit={handleSubmit} initialData={initialData} />
+        {/* <MultiStepForm onSubmit={handleSubmit} initialData={initialData} /> */}
+                <OneStepForm onSubmit={handleSubmit} initialData={initialData} />
+
     </div>
   );
 };

@@ -18,15 +18,6 @@
     "projectId": "dhl9kw0jn"
   },
   {
-    "id": "1758022153610-1748506122186-Isometric-Projection (1).jpg",
-    "name": "1748506122186-Isometric-Projection (1).jpg",
-    "size": 435357,
-    "type": "image/jpeg",
-    "url": "http://localhost:5000/uploads/1758022153610-1748506122186-Isometric-Projection (1).jpg",
-    "lastModified": 1758022153644,
-    "projectId": "wsctl6k1y"
-  },
-  {
     "id": "1758193693630-P16093-16-01-08-1677-1.pdf",
     "name": "P16093-16-01-08-1677-1.pdf",
     "size": 667435,
@@ -108,12 +99,12 @@
     "projectId": "wsctl6k1y"
   },
   {
-    "id": "1758534511591-Screenshot 2025-09-22 134756.png",
-    "name": "Screenshot 2025-09-22 134756.png",
-    "size": 342379,
-    "type": "image/png",
-    "url": "http://localhost:5000/uploads/1758534511591-Screenshot 2025-09-22 134756.png",
-    "lastModified": 1758534511612,
+    "id": "1758782271498-P16010-16-01-08-1787-1.jpg",
+    "name": "P16010-16-01-08-1787-1.jpg",
+    "size": 2827202,
+    "type": "image/jpeg",
+    "url": "http://localhost:5000/uploads/1758782271498-P16010-16-01-08-1787-1.jpg",
+    "lastModified": 1758782271554,
     "projectId": "wsctl6k1y"
   }
 ]

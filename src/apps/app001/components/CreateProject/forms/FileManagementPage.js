@@ -1,38 +1,57 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { Link } from "react-router-dom";
-import { setSelectedFiles, clearSelectedFiles } from "../../../../../redux/slices/file-upload/fileSelectionSlice";
+import { setSelectedFiles } from "../../../../../redux/slices/file-upload/fileSelectionSlice";
 import { showNotification } from "../../../../../redux/slices/notification/notificationSlice";
-import { fetchUploadedFiles,  saveNewFilesToDB } from "../../../../../redux/slices/shared/fileUploadSlice";
-import BaseModal from "../../../../../components/ui/BaseModal";
+import { fetchUploadedFiles, saveNewFilesToDB } from "../../../../../redux/slices/shared/fileUploadSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tooltip from "@mui/material/Tooltip";
-import { setFileStatuses } from "../../../../../redux/slices/file-upload/fileStatusSlice";
 
-const FileManagementPage = ({ projectId, onClose }) => {
+const formatSize = (size) => {
+  if (!size) return "0 KB";
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+};
+
+const formatDate = (date) => {
+  if (!date) return "N/A";
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+// Extract serial number as per new format: last "-" separated part before file extension
+const getSerialNo = (fileName) => {
+  if (!fileName) return "";
+  const nameWithoutExt = fileName.split(".")[0];
+  const parts = nameWithoutExt.split("-");
+  return parts.length > 1 ? parts[parts.length - 2] : "";
+};
+
+const getType = (file) => {
+  if (!file.type && file.name) {
+    const ext = file.name.split(".").pop().toLowerCase();
+    if (ext === "pdf") return "PDF";
+    if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext)) return "Image";
+  }
+  if (file.type && file.type.toLowerCase().includes("pdf")) return "PDF";
+  if (file.type && file.type.toLowerCase().includes("image")) return "Image";
+  return "Other";
+};
+
+const FileManagementPage = ({ projectId }) => {
   const dispatch = useDispatch();
   const files = useSelector((state) => state.fileManagement.files);
-  const loading = useSelector((state) => state.fileManagement.loading); // Get loading state
-  const selectedFiles = useSelector((state) => state.fileSelection.selectedFiles || []); // Fallback to an empty array
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const isSubSidebarOpen = useSelector((state) => state.sidebar.isSubSidebarOpen); // SubSidebar state
-  const isMobileSidebarOpen = useSelector((state) => state.sidebar.isMobileSidebarOpen); // Add this line
+  const loading = useSelector((state) => state.fileManagement.loading);
   const fileStatuses = useSelector((state) => state.fileStatus);
-  const appId = useSelector((state) => state.app.appId); // <-- get appId from redux
-
-  // Set overflow-y: hidden on main layout only while this page is mounted
-  useEffect(() => {
-    const main = document.querySelector("main");
-    if (main) {
-      const prev = main.style.overflowY;
-      main.style.overflowY = "hidden";
-      return () => {
-        main.style.overflowY = prev || "";
-      };
-    }
-  }, []);
+  const appId = useSelector((state) => state.app.appId);
+  const isSubSidebarOpen = useSelector((state) => state.sidebar.isSubSidebarOpen);
+  const isMobileSidebarOpen = useSelector((state) => state.sidebar.isMobileSidebarOpen);
 
   useEffect(() => {
     if (projectId) {
@@ -40,61 +59,56 @@ const FileManagementPage = ({ projectId, onClose }) => {
     }
   }, [dispatch, projectId]);
 
-  const rows = files.map((file, index) => {
-    // Extract number part before the first '-'
-    let numberId = "";
-    if (file.id && file.id.includes('-')) {
-      numberId = file.id.split('-')[0];
-    }
-    return {
-      id: file.id || file.name || index + 1, // Keep full id for internal use
-      numberId, // Only the number part for display
-      name: file.name || "N/A",
-      type: file.type || "Unknown",
-      size: file.size || 0,
-      lastModified: file.lastModified
-        ? new Date(file.lastModified).toISOString().split("T")[0]
-        : "N/A",
-      discipline: file.discipline || "N/A",
-      uploadedPages: file.uploadedPages || 0,
-      clearedPages: file.clearedPages || 0,
-      approvedPages: file.approvedPages || 0,
-    };
-  });
-console.log("lakappId:", appId, "lakprojectId:", projectId);
+  const rows = files.map((file, index) => ({
+    id: file.id || file.name || index + 1,
+    serialNo: getSerialNo(file.name),
+    name: file.name || "N/A",
+    type: getType(file),
+    size: formatSize(file.size),
+    lastModified: formatDate(file.lastModified),
+    status: fileStatuses[file.id] || "Not processed",
+  }));
+
   const columns = [
-    { field: "numberId", headerName: "ID", width: 100 }, // Show only number part
+    { field: "serialNo", headerName: "Serial No", width: 150, headerAlign: "center", align: "center" },
     {
       field: "name",
-      headerName: "Name",
-      flex: 1,
-      minWidth: 100,
+      headerName: "Drawing Title",
+      // flex: 1,
+      minWidth: 280,
       renderCell: (params) => {
-        const cleanDocId = params.row.id.match(/^\d+/)?.[0];
         const status = fileStatuses[params.row.id];
         const isSuccess = status === "success";
         return isSuccess ? (
-          <Link
-            to={`/app/${appId}/dashboard/project/${projectId}/view/${cleanDocId}`}
-            className="text-blue-500 hover:underline"
-            state={{ projectId, fileId: params.row.id }}
-          >
-            {params.value}
-          </Link>
+          <Tooltip title={params.value} arrow>
+            <Link
+              to={`/app/${appId}/dashboard/project/${projectId}/view/${params.row.serialNo}`}
+              className="text-blue-600 font-medium hover:underline truncate block max-w-[180px] sm:max-w-[240px] md:max-w-[320px] lg:max-w-[400px]"
+              style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+              state={{ projectId, fileId: params.row.id }}
+            >
+              {params.value}
+            </Link>
+          </Tooltip>
         ) : (
-          <span
-            className="text-gray-400 cursor-not-allowed"
-            title="Only successfully processed files can be viewed."
-          >
-            {params.value}
-          </span>
+          <Tooltip title={params.value} arrow>
+            <span
+              className="text-gray-400 cursor-not-allowed truncate block max-w-[180px] sm:max-w-[240px] md:max-w-[320px] lg:max-w-[400px]"
+              style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+              title="Only successfully processed files can be viewed."
+            >
+              {params.value}
+            </span>
+          </Tooltip>
         );
       },
     },
     {
       field: "status",
       headerName: "Status",
-      width: 70,
+      width: 150,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => {
         const status = fileStatuses[params.row.id];
         let dotColor = "bg-gray-400";
@@ -118,44 +132,42 @@ console.log("lakappId:", appId, "lakprojectId:", projectId);
         );
       }
     },
-    { field: "size", headerName: "Size (bytes)", flex: 1, minWidth: 100 },
-    { field: "lastModified", headerName: "Last Modified", flex: 1, minWidth: 150 },
-    { field: "discipline", headerName: "Discipline", flex: 1, minWidth: 100 },
-    { field: "uploadedPages", headerName: "Uploaded Pages", flex: 1, minWidth: 100 },
-    { field: "clearedPages", headerName: "Cleared Pages", flex: 1, minWidth: 100 },
-    { field: "approvedPages", headerName: "Approved Pages", flex: 1, minWidth: 100 },
+    {
+      field: "type",
+      headerName: "Type",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => (
+        <span>
+          {params.value === "PDF" || params.value === "Image" ? params.value : ""}
+        </span>
+      ),
+    },
+    {
+      field: "size",
+      headerName: "Size",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "lastModified",
+      headerName: "Last Modified",
+      width:180,
+      headerAlign: "center",
+      align: "center",
+    },
   ];
-
- 
-
-
-  // Pass a callback to the modal to handle file uploads
-  const handleFileUpload = (uploadedFiles) => {
-    if (!uploadedFiles || uploadedFiles.length === 0) {
-      dispatch(showNotification({message: "No files selected for upload.", type: "info" }));
-      return;
-    }
-  
-    dispatch(saveNewFilesToDB({ files: uploadedFiles, projectId }))
-      .then(() => {
-        dispatch(showNotification({message: `${uploadedFiles.length} file(s) uploaded successfully.`, type: "success" }));
-      })
-      .catch((error) => {
-        dispatch(showNotification({message: "Failed to upload files to the server.", type: "error" }));
-        console.error("Error uploading files:", error);
-      });
-  };
 
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files);
-
-    // Dispatch action to save files to the backend
     dispatch(saveNewFilesToDB({ files: newFiles, projectId }))
       .then(() => {
-        dispatch(showNotification({message: `${newFiles.length} file(s) uploaded successfully.`, type: "success" }));
+        dispatch(showNotification({ message: `${newFiles.length} file(s) uploaded successfully.`, type: "success" }));
       })
       .catch((error) => {
-        dispatch(showNotification({message: "Failed to upload files to the server.", type: "error" }));
+        dispatch(showNotification({ message: "Failed to upload files to the server.", type: "error" }));
         console.error("Error uploading files:", error);
       });
   };
@@ -163,14 +175,12 @@ console.log("lakappId:", appId, "lakprojectId:", projectId);
   const handleDrop = (e) => {
     e.preventDefault();
     const newFiles = Array.from(e.dataTransfer.files);
-
-    // Dispatch action to save files to the backend
     dispatch(saveNewFilesToDB({ files: newFiles, projectId }))
       .then(() => {
-        dispatch(showNotification({message: `${newFiles.length} file(s) uploaded successfully.`, type: "success" }));
+        dispatch(showNotification({ message: `${newFiles.length} file(s) uploaded successfully.`, type: "success" }));
       })
       .catch((error) => {
-        dispatch(showNotification({message: "Failed to upload files to the server.", type: "error" }));
+        dispatch(showNotification({ message: "Failed to upload files to the server.", type: "error" }));
         console.error("Error uploading files:", error);
       });
   };
@@ -180,57 +190,41 @@ console.log("lakappId:", appId, "lakprojectId:", projectId);
   };
 
   const handleRowSelection = (selectionModel) => {
-    console.log("Selection Model:", selectionModel); // Debug log
-  
-    // Extract IDs from the Set
     const selectedIds = Array.from(selectionModel.ids || []);
-    console.log("Selected IDs:", selectedIds); // Debug log
-  
-    // Filter rows based on selected IDs
     const selectedRows = rows.filter((row) => selectedIds.includes(row.id));
-    console.log("Selected Rows:", selectedRows); // Debug log
-  
-    // Dispatch the selected rows to Redux
     dispatch(setSelectedFiles(selectedRows));
   };
 
-
-
- // Calculate dynamic width based on sidebar state
-  const sidebarWidth = 32; // Sidebar width when open or closed
-  const subSidebarWidth =2; // SubSidebar width
-  const tableWidth = `calc(100% - ${subSidebarWidth}`; // Adjust table width dynamically
   return (
     <div
-      className="px-0 w-full max-w-full mx-auto overflow-x-auto"
+      className="w-full max-w-full mx-auto"
       style={{
         maxWidth: isMobileSidebarOpen
-          ? "100vw" // Full width on mobile when sidebar is open
+          ? "100vw"
           : isSubSidebarOpen
-            ? "calc(100vw - 32px - 150px)" // Desktop: Sidebar + SubSidebar
-            : "calc(100vw - 32px)",        // Desktop: Only Sidebar
+            ? "calc(100vw - 32px - 150px)"
+            : "calc(100vw - 32px)",
       }}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-     
-      {loading ? ( // Show loading indicator while files are being uploaded or fetched
+      {loading ? (
         <div className="flex justify-center items-center h-64">
           <CircularProgress />
           <p className="ml-4 text-gray-600">Loading files...</p>
         </div>
       ) : files.length > 0 ? (
-                <>
-          {/* <h2 className="text-2xl font-semibold my-2">Uploaded Files</h2> */}
-
-        <div className="p-4 h-full w-full min-w-[350px]">
+        <div className="p-2 sm:p-4 h-full w-full min-w-[320px]">
           <Paper
             sx={{
               width: "100%",
               maxWidth: "100%",
-              height: "calc(100vh - 132px)",
+              height: "calc(100vh - 160px)",
               minHeight: 300,
               overflow: "auto",
+              boxShadow: 3,
+              borderRadius: 3,
+              border: "1px solid #e5e7eb",
             }}
           >
             <DataGrid
@@ -242,7 +236,32 @@ console.log("lakappId:", appId, "lakprojectId:", projectId);
               pagination
               sx={{
                 width: "100%",
-                minWidth: 350,
+                minWidth: 320,
+                fontFamily: "inherit",
+                fontSize: "1rem",
+                "& .MuiDataGrid-columnHeaders": {
+                  background: "#f3f4f6",
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                },
+                "& .MuiDataGrid-row": {
+                  background: "#fff",
+                  "&:hover": {
+                    background: "#f1f5f9",
+                  },
+                },
+                "& .MuiDataGrid-cell": {
+                  borderBottom: "1px solid #e5e7eb",
+                  maxWidth: "100vw",
+                },
+                "& .MuiDataGrid-virtualScroller": {
+                  overflowX: "auto !important",
+                },
+                "& .MuiDataGrid-cellContent": {
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                },
                 "& .Mui-selected-row": {
                   backgroundColor: "rgba(25, 118, 210, 0.08)",
                   "&:hover": {
@@ -253,50 +272,31 @@ console.log("lakappId:", appId, "lakprojectId:", projectId);
             />
           </Paper>
         </div>
-                </>
       ) : (
         <div className="mt-4 flex justify-center">
-  <div
-    className="w-full max-w-sm sm:max-w-md lg:max-w-lg border-2 border-dashed border-gray-300 dark:border-gray-700 p-4 rounded-lg text-center"
-    onDrop={handleDrop}
-    onDragOver={handleDragOver}
-  >
-     <p className="text-base font-medium text-gray-700 dark:text-gray-300 mb-4">
-      No files uploaded yet
-    </p>
-    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-      Drag and drop files here, or click the button below to upload.
-    </p>
-    <input
-      type="file"
-      multiple
-      onChange={handleFileChange}
-      className="hidden"
-      id="file-upload-input"
-    />
-    <label htmlFor="file-upload-input" className="cursor-pointer text-blue-500">
-      Browse Files
-    </label>
-  </div>
-  <ul className="mt-4 text-sm">
-    {files.length > 0 &&
-      files.map((file, index) => (
-        <li key={index} className="text-gray-600 dark:text-gray-300">
-          {file.name}
-        </li>
-      ))}
-  </ul>
-</div>
-      )}
-
-      {/* Upload Modal */}
-      {isUploadModalOpen && (
-        <BaseModal
-          message="Upload Files"
-          onCancel={() => setIsUploadModalOpen(false)}
-          onOk={handleFileUpload}
-          showFileUpload={true}
-        />
+          <div
+            className="w-full max-w-sm sm:max-w-md lg:max-w-lg border-2 border-dashed border-gray-300 dark:border-gray-700 p-4 rounded-lg text-center"
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
+            <p className="text-base font-medium text-gray-700 dark:text-gray-300 mb-4">
+              No files uploaded yet
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Drag and drop files here, or click the button below to upload.
+            </p>
+            <input
+              type="file"
+              multiple
+              onChange={handleFileChange}
+              className="hidden"
+              id="file-upload-input"
+            />
+            <label htmlFor="file-upload-input" className="cursor-pointer text-blue-500">
+              Browse Files
+            </label>
+          </div>
+        </div>
       )}
     </div>
   );

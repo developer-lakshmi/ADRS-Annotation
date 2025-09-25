@@ -3,12 +3,14 @@
   "projects": [
     {
       "id": "wsctl6k1y",
-      "projectName": "Test Project",
+      "projectName": "Test Projects",
+      "userId": "12234",
+      "decipline": "Process",
+      "docType": "PDF",
+      "projectDescription": "Project Description",
       "clientName": "",
       "projectCode": "1345",
-      "decipline": "Process",
       "mLModel": "",
-      "docType": "",
       "projectPurpose": "",
       "description": "",
       "cadSystem": "",
