@@ -240,7 +240,7 @@ const handleProcess = () => {
               <div className="flex items-center space-x-1 sm:space-x-2">
                 {/* Action buttons - responsive layout */}
                 <div className="flex items-center space-x-1 sm:space-x-2">
-                  <Tooltip title="Edit" arrow>
+                  {/* <Tooltip title="Edit" arrow>
                     <span>
                       <button
                         className={`${iconButtonClass} bg-blue-500 hover:bg-blue-600 ${selectedFiles.length !== 1 ? "opacity-50 cursor-not-allowed" : ""} p-1.5 sm:p-2`}
@@ -249,7 +249,7 @@ const handleProcess = () => {
                         <Pencil size={12} className="sm:w-3.5 sm:h-3.5" />
                       </button>
                     </span>
-                  </Tooltip>
+                  </Tooltip> */}
 
                   <Tooltip title="Delete" arrow>
                     <span>
